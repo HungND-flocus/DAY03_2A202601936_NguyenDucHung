@@ -1,102 +1,404 @@
-# 📋 SỔ TAY PHÂN CÔNG & CHECKLIST THỰC HÀNH (ZERO-CONFLICT WORKFLOW)
+# PHAN CONG CONG VIEC - NHOM 4 NGUOI
 
-> 💡 **Hướng dẫn**: Mỗi thành viên mở đúng file được phân công trong thư mục dự án và thực hiện checklist theo từng Mốc.
+Du an: **Tro Ly Tu Van Khoa Hoc Sinh Vien**
 
----
-
-## 👥 1. BẢNG PHÂN VAI & FILE ĐẢM NHẬN
-
-| Vai trò (Role)                               | File đảm nhận           | Nhiệm vụ chính                                                                                          | Người đảm nhận  |
-| :-------------------------------------------- | :------------------------- | :--------------------------------------------------------------------------------------------------------- | :------------------- |
-| **Role 1: Product Architect**           | `config/test_cases.json` | Định hướng bài toán & soạn bộ câu test case                                                       | `________________` |
-| **Role 2: Tool Engineer**               | `src/tools.py`           | Định nghĩa các công cụ (Tools) cho Agent                                                             | `________________` |
-| **Role 3: Prompt Engineer**             | `src/prompts.py`         | Viết ReAct System Prompt & phanh Guardrails                                                               | `________________` |
-| **Role 4: Core Developer / Integrator** | `src/app.py`             | **Đầu mối kéo code/file của nhóm (`git pull`), Vibe Code lắp ráp thành App hoàn chỉnh** | `________________` |
-| **Role 5: Observability**               | `docs/trace_eval.md`     | Lập bảng Scoring Matrix & Soi nhật ký Trace Log                                                        | `________________` |
-
-*Note: Nếu nhóm 6 người, Role 5 tách thành 5A (Trace Analyst) và 5B (Flowchart Architect).*
-
-> 🌟 **VAI TRÒ NÒNG NỐT CỦA ROLE 4 (ĐẦU MỐI LẮP RÁP APP HOÀN CHỈNH)**:
->
-> - **Role 4** đóng vai trò là **Tổ trưởng Lắp ráp**: Sau khi các bạn Role 1, 2, 3 đẩy file lên Git, **Role 4 sẽ gõ `git pull`** để gom toàn bộ dữ liệu về máy.
-> - **Role 4** sau đó dùng AI (Vibe Code) để kết nối `tools.py`, `prompts.py`, `test_cases.json` vào file `src/app.py`, biến các mảnh ghép thành **một Ứng dụng AI Agent hoàn chỉnh** cho cả nhóm chạy nghiệm thu.
+Muc tieu: xay dung chatbot/agent co the tu van mon hoc dua tren nganh hoc, so tin chi, mon tien quyet, muc tieu nghe nghiep, lich hoc va nang luc hien tai cua sinh vien.
 
 ---
 
-## ⏱️ 2. CHECKLIST THỰC HÀNH THEO 4 MỐC
+## 1. Nguyen tac lam viec
 
-### 📍 MỐC 1: Định hình & Đánh giá độ phù hợp (Agentic Fit) (20 phút)
-
-*Mục tiêu: Chứng minh bài toán này CẦN dùng Agent chứ không chỉ Chatbot.*
-
-- [ ] **Role 1 & Cả nhóm**: **Tự do lựa chọn 1 chủ đề bài toán thực tế** mà nhóm hào hứng nhất (Xem 10 đề tài gợi ý tại: [DANH_SACH_DE_TAI.md](file:///c:/Users/Admin/Documents/VinUni/LabCoachVin/LabKeyCoach/Day-3-Lab-Chatbot-vs-react-agent-E402/docs/DANH_SACH_DE_TAI.md)).
-- [ ] **Role 5**: Điền bảng **Scoring Matrix** (chấm 1–5 điểm cho 4 tiêu chí) vào `docs/trace_eval.md`.
-- [ ] **Role 2**: Liệt kê tên các công cụ sẽ tạo trong `src/tools.py` phù hợp với chủ đề nhóm đã chọn.
-- [ ] **Role 3**: Xác định các trường hợp tool có thể bị lỗi (Failure Modes).
-- [ ] **Role 4**: Mở Terminal gõ `python src/app.py` kiểm tra xem môi trường sẵn sàng chưa.
-- [ ] 🤝 **Cả nhóm**: Gật đầu thống nhất bài toán trước khi sang Mốc 2.
-- [ ] 🔄 **Đồng bộ Git Mốc 1**: Cả nhóm lưu file, đẩy code lên Git: `git add .` ➔ `git commit -m "Moc 1: Scoring Matrix & Dinh hinh"` ➔ `git push`.
+- Moi ban lam tren **branch rieng**, khong code truc tiep tren `main`.
+- Moi branch nen phu trach it file nhat co the de tranh conflict.
+- Truoc khi code: `git pull origin main`.
+- Sau khi xong: commit, push branch, tao Pull Request, nho it nhat 1 ban review roi moi merge.
+- Khong commit `.env`, API key, token, file cache, file tam.
 
 ---
 
-### 📍 MỐC 2: Baseline Chatbot & Khai báo Tool Specs (30 phút)
+## 2. Bang phan cong cho 4 thanh vien
 
-*Mục tiêu: Thấy rõ hạn chế của Chatbot gốc và chuẩn hóa công cụ cho Agent.*
+| Thanh vien | Vai tro | File chinh | Nhiem vu |
+| :--- | :--- | :--- | :--- |
+| TV1 | Product + Data/Test Designer | `config/test_cases.json`, `docs/trace_eval.md` | Dinh nghia bai toan, viet test cases, lap bang Agentic Fit, ghi ket qua test |
+| TV2 | Tool Engineer | `src/tools.py` | Viet cac tool tra cuu khoa hoc, check dieu kien tien quyet, tinh workload |
+| TV3 | Prompt + Guardrail Engineer | `src/prompts.py` | Viet prompt baseline, ReAct prompt, quy tac an toan, gioi han lap |
+| TV4 | Integrator + Git Lead + Demo | `src/app.py`, `README.md` | Noi tools/prompts/tests thanh app chay duoc, xu ly merge, chay demo cuoi |
 
-- [ ] **Role 1**: Viết bộ **Test Cases** vào file `config/test_cases.json` (câu đơn giản, câu multi-step, câu bẫy).
-- [ ] **Role 2**: Dùng AI bổ sung Docstring / Mô tả chuẩn cho các hàm trong `src/tools.py`.
-- [ ] **Role 3**: Soạn `CHATBOT_BASELINE_PROMPT` trong file `src/prompts.py`.
-- [ ] **Role 4 (Đầu mối Lắp ráp)**: Gõ `git pull` để kéo file của Role 1, 2, 3 về máy ➔ Vibe Code nối `run_baseline_chatbot()` trong `src/app.py` và bấm chạy thử.
-- [ ] **Role 5**: Ghi lại phản hồi của Chatbot gốc vào `docs/trace_eval.md` (quan sát xem Chatbot có bị ảo giác/không biết thông tin thực tế không).
-- [ ] 🔄 **Đồng bộ Git Mốc 2**: Cả nhóm lưu file, đẩy code lên Git: `git add .` ➔ `git commit -m "Moc 2: Chatbot Baseline & Tool Specs"` ➔ `git push`.
+Neu chua co ten thanh vien, gan tam:
 
----
-
-### 📍 MỐC 3: ReAct Loop & Safeguards (60 phút)
-
-*Mục tiêu: Dựng ReAct Agent suy luận Thought -> Action và cài phanh an toàn.*
-
-- [ ] **Role 3**: Soạn `REACT_SYSTEM_PROMPT` (ép AI sinh Thought -> Action) và đặt `MAX_ITERATIONS (giới hạn số lần lặp)` trong `src/prompts.py`.
-- [ ] **Role 2**: Đảm bảo các hàm trong `src/tools.py` khi gặp lỗi sẽ trả về chuỗi thông báo lỗi chứ không crash code.
-- [ ] **Role 4 (Đầu mối Lắp ráp & Vibe App)**: Gõ `git pull` kéo toàn bộ code mới nhất ➔ Vibe Code lắp vòng lặp ReAct Agent Loop hoàn chỉnh trong `src/app.py` và chạy thử nghiệm.
-- [ ] **Role 5**: Trích xuất chuỗi `Thought -> Action -> Observation` dán vào `docs/trace_eval.md`.
-- [ ] **Role 1**: Kiểm tra xem Agent có vượt qua được câu bẫy (Edge Case) bằng phanh Guardrail hay không.
-- [ ] 🔄 **Đồng bộ Git Mốc 3**: Cả nhóm lưu file, đẩy code lên Git: `git add .` ➔ `git commit -m "Moc 3: ReAct Agent Loop & Safeguards"` ➔ `git push`.
+- TV1: Nguyen Van A
+- TV2: Nguyen Van B
+- TV3: Nguyen Van C
+- TV4: Nguyen Van D
 
 ---
 
-### 📍 MỐC 4: Tương tác liên nhóm & Hybrid Flowchart (40 phút)
+## 3. Chi tiet cong viec tung thanh vien
 
-*Mục tiêu: Thử thách khả năng chịu lỗi trước đòn tấn công từ nhóm khác & Chấm chéo linh hoạt.*
+### TV1 - Product + Data/Test Designer
 
-> 💡 **HÌNH THỨC TƯƠNG TÁC (Tùy Giảng viên chỉ định)**:
->
-> * 🎲 **Hình thức 1 (Gọi ngẫu nhiên)**: Giảng viên gọi ngẫu nhiên một thành viên đại diện trong bất kỳ nhóm nào lên trình chiếu App, phản biện và trả lời câu hỏi bẫy từ các nhóm khác.
-> * 🔄 **Hình thức 2 (Chấm chéo nhóm)**: Giảng viên chỉ định 1 bạn đại diện (VD: Role 1 hoặc Role 5) đi sang nhóm khác để "tấn công" (dùng câu bẫy thử nghiệm Agent nhóm bạn) và chấm điểm chéo.
+Branch: `feature/tv1-test-cases`
 
-- [ ] ⚔️ **Đội Tấn Công (Đại diện/Học viên được gọi)**: Mang các câu test case của nhóm mình sang "xả" vào Agent của Nhóm bạn để kiểm thử khả năng chịu lỗi.
-- [ ] 🛡️ **Đội Phòng Thủ**: Quan sát Agent nhóm mình phản ứng trước câu hỏi của nhóm bạn. Kiểm tra xem Guardrail bảo vệ an toàn không.
-- [ ] 📊 **Role 5B (hoặc Role 5)**: Vẽ sơ đồ **Hybrid Flowchart** vào file `docs/hybrid_flowchart.mermaid` thể hiện phân luồng:
-  - Câu hỏi đơn giản ➔ Đi đường Chatbot path.
-  - Câu hỏi phức tạp ➔ Đi đường ReAct Agent path.
-- [ ] 🔄 **Đồng bộ Git Mốc 4 (Hoàn thành)**: Cả nhóm lưu file, đẩy bản hoàn chỉnh lên Git: `git add .` ➔ `git commit -m "Moc 4: Cross Audit & Hybrid Flowchart Hoan thanh"` ➔ `git push`.
+Cong viec:
+
+- Xac dinh ro nguoi dung: sinh vien can tu van chon mon hoc.
+- Viet 5-7 test cases trong `config/test_cases.json`.
+- Test cases can co:
+  - Cau hoi don gian: hoi mon hoc phu hop cho nguoi moi bat dau.
+  - Cau hoi multi-step: dua GPA, nganh, mon da hoc, yeu cau agent goi tool check dieu kien.
+  - Cau hoi lap ke hoach: goi y 3 mon cho hoc ky toi voi gioi han tin chi.
+  - Edge case: mon khong ton tai, thieu mon tien quyet, qua tai tin chi.
+- Cap nhat `docs/trace_eval.md`:
+  - Bang Agentic Fit.
+  - So sanh Chatbot Baseline vs ReAct Agent.
+  - Dan trace `Thought -> Action -> Observation -> Final Answer`.
+
+Ket qua can ban giao:
+
+- `config/test_cases.json` hop le JSON.
+- `docs/trace_eval.md` co bang danh gia va ket qua test.
 
 ---
 
-Vì mỗi thành viên giữ đúng 1 file trong các thư mục riêng (`config/`, `src/`, `docs/`), bạn chỉ cần nhớ quy trình :
+### TV2 - Tool Engineer
 
-**Trước khi gõ code**: Kéo code mới của nhóm về:
+Branch: `feature/tv2-course-tools`
+
+Cong viec:
+
+- Sua `src/tools.py` thanh bo tool dung cho tu van khoa hoc.
+- Nen co toi thieu 3 tool:
+  - `search_courses(keyword: str)`: tim mon hoc theo tu khoa/nganh.
+  - `check_prerequisites(course_id: str, completed_courses: str)`: kiem tra mon tien quyet.
+  - `estimate_workload(course_ids: str)`: uoc tinh so tin chi va muc do nang.
+- Moi tool can co docstring ro:
+  - Input la gi.
+  - Output la gi.
+  - Khi loi thi tra ve chuoi `"LOI: ..."` thay vi lam crash app.
+- Dang ky tool vao `AVAILABLE_TOOLS`.
+
+Ket qua can ban giao:
+
+- `src/tools.py` chay duoc doc lap.
+- Tool khong crash khi nhap sai mon hoc hoac thieu du lieu.
+
+---
+
+### TV3 - Prompt + Guardrail Engineer
+
+Branch: `feature/tv3-prompts`
+
+Cong viec:
+
+- Sua `src/prompts.py` theo dung chu de tu van khoa hoc.
+- `CHATBOT_BASELINE_PROMPT`:
+  - Tra loi nhu chatbot tu van thong thuong.
+  - Khong duoc gia vo da tra cuu database.
+  - Neu thieu thong tin, hoi lai sinh vien.
+- `REACT_SYSTEM_PROMPT`:
+  - Bat agent dung format:
+    - `Thought: ...`
+    - `Action: tool_name[tham_so]`
+    - `Final Answer: ...`
+  - Liet ke dung tool cua TV2.
+  - Neu sinh vien thieu thong tin quan trong, hoi lai thay vi doan.
+- Guardrail:
+  - Giu `MAX_ITERATIONS = 3` hoac `4`.
+  - Chan tu van qua so tin chi hop ly.
+  - Neu chua dat dieu kien tien quyet thi khong goi y dang ky mon do.
+
+Ket qua can ban giao:
+
+- `src/prompts.py` ro format, ro tool, ro cach fallback.
+
+---
+
+### TV4 - Integrator + Git Lead + Demo
+
+Branch: `feature/tv4-integrate-app`
+
+Cong viec:
+
+- Sua `src/app.py` de chay test cases cua TV1.
+- Ket noi:
+  - `config/test_cases.json`
+  - `src/tools.py`
+  - `src/prompts.py`
+  - `providers.py`
+- Chay duoc 2 che do:
+  - Baseline chatbot.
+  - ReAct agent co tool.
+- Ghi log de TV1 dua vao `docs/trace_eval.md`.
+- Lam Git lead:
+  - Kiem tra PR cua cac ban.
+  - Merge theo thu tu it conflict.
+  - Chay test sau moi lan merge.
+- Cap nhat `README.md` cach cai dat va chay demo neu can.
+
+Ket qua can ban giao:
+
+- `python src/app.py` chay duoc tu dau den cuoi.
+- Demo duoc 1 cau don gian, 1 cau multi-step, 1 edge case.
+
+---
+
+## 4. Quy trinh Git cho ca nhom
+
+### Lan dau clone project
 
 ```bash
-   git pull
+git clone <link-repo>
+cd DAY03_2A202601936_NguyenDucHung
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
 ```
 
-**Đẩy code lên cho nhóm**:
+Windows PowerShell:
+
+```powershell
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
+```
+
+### Tao branch rieng
+
+TV1:
 
 ```bash
-   git add .
-   git commit -m "Role X: cap nhat noi dung"
-   git push
+git switch main
+git pull origin main
+git switch -c feature/tv1-test-cases
 ```
 
-*(Nếu push bị chặn do bạn khác push trước: Gõ `git pull` rồi `git push` lại là xong!)*
+TV2:
+
+```bash
+git switch main
+git pull origin main
+git switch -c feature/tv2-course-tools
+```
+
+TV3:
+
+```bash
+git switch main
+git pull origin main
+git switch -c feature/tv3-prompts
+```
+
+TV4:
+
+```bash
+git switch main
+git pull origin main
+git switch -c feature/tv4-integrate-app
+```
+
+### Commit va push
+
+```bash
+git status
+git add <file-da-sua>
+git commit -m "feat: mo ta ngan gon viec da lam"
+git push -u origin <ten-branch>
+```
+
+Vi du:
+
+```bash
+git add config/test_cases.json docs/trace_eval.md
+git commit -m "feat: add course advisor test cases"
+git push -u origin feature/tv1-test-cases
+```
+
+### Tao Pull Request
+
+Moi ban tao PR tu branch cua minh vao `main`.
+
+Tieu de PR nen theo mau:
+
+```text
+[TV1] Add course advisor test cases
+[TV2] Add course advisor tools
+[TV3] Add ReAct prompts and guardrails
+[TV4] Integrate course advisor app
+```
+
+Checklist PR:
+
+- Code/file dung phan cong.
+- Khong sua file cua ban khac neu khong can.
+- `python src/app.py` khong loi, neu branch da co du file de chay.
+- Khong co API key/token.
+
+### Thu tu merge de it conflict
+
+Nen merge theo thu tu:
+
+1. TV1: `config/test_cases.json`, `docs/trace_eval.md`
+2. TV2: `src/tools.py`
+3. TV3: `src/prompts.py`
+4. TV4: `src/app.py`, `README.md`
+
+Sau moi PR duoc merge, ca nhom cap nhat lai may:
+
+```bash
+git switch main
+git pull origin main
+```
+
+Neu branch cua ban bi cu so voi `main`:
+
+```bash
+git switch <ten-branch>
+git pull origin main
+git push
+```
+
+---
+
+## 5. Cach xu ly conflict don gian
+
+Khi `git pull` bao conflict:
+
+```bash
+git status
+```
+
+Mo file bi conflict, tim cac dau:
+
+```text
+<<<<<<< HEAD
+noi dung cua minh
+=======
+noi dung tu main
+>>>>>>> main
+```
+
+Giu lai phan dung, xoa 3 dong ky hieu conflict, sau do:
+
+```bash
+git add <file-bi-conflict>
+git commit -m "fix: resolve merge conflict"
+git push
+```
+
+Neu khong chac nen giu phan nao, hoi TV4 truoc khi commit.
+
+---
+
+## 6. Ke hoach theo 4 moc va output tung thanh vien
+
+### Moc 1 - Dinh hinh & Danh gia Agentic Fit (20 phut)
+
+Muc tieu: chot bai toan **Tro Ly Tu Van Khoa Hoc Sinh Vien** va chung minh bai toan can Agent.
+
+| Thanh vien | Can lam | Output can co |
+| :--- | :--- | :--- |
+| TV1 | Mo ta user, nhu cau, ranh gioi bai toan; lap Scoring Matrix Agentic Fit | `docs/trace_eval.md` co bang Agentic Fit va ket luan co nen dung Agent |
+| TV2 | De xuat cac tool can co de tra cuu khoa hoc | Danh sach tool du kien: `search_courses`, `check_prerequisites`, `estimate_workload` |
+| TV3 | Liet ke failure modes va guardrails can co | Ghi nhanh quy tac: thieu thong tin thi hoi lai, khong du dieu kien thi khong goi y dang ky |
+| TV4 | Kiem tra moi truong va app hien tai co chay duoc khong | Terminal chay duoc `python3 src/app.py` hoac ghi ro loi moi truong |
+
+Output chung cua Moc 1:
+
+- Bai toan da chot: tu van khoa hoc sinh vien.
+- Co bang Agentic Fit trong `docs/trace_eval.md`.
+- Co danh sach tool can lam.
+- Co branch rieng cho moi thanh vien.
+
+Commit goi y:
+
+```bash
+git commit -m "docs: define course advisor scope"
+```
+
+### Moc 2 - Baseline Chatbot & Khai bao Tool (30 phut)
+
+Muc tieu: co chatbot baseline, tool specs va it nhat 5 test cases.
+
+| Thanh vien | Can lam | Output can co |
+| :--- | :--- | :--- |
+| TV1 | Viet 5-7 test cases gom don gian, multi-step, thieu thong tin, edge case | `config/test_cases.json` hop le JSON, dung chu de tu van khoa hoc |
+| TV2 | Viet tool specs va code tool ban dau trong `src/tools.py` | Tool co docstring, input/output ro, loi tra ve chuoi `LOI: ...` |
+| TV3 | Viet `CHATBOT_BASELINE_PROMPT` va khung `REACT_SYSTEM_PROMPT` | `src/prompts.py` co prompt baseline, danh sach tool va format tra loi |
+| TV4 | Noi baseline chatbot voi test cases va chay thu | `src/app.py` doc duoc `config/test_cases.json`, chay baseline tren it nhat 1 case |
+
+Output chung cua Moc 2:
+
+- `config/test_cases.json` co it nhat 5 test cases.
+- `src/tools.py` co tool specs.
+- `src/prompts.py` co baseline prompt.
+- Baseline chatbot chay duoc de so sanh.
+
+Commit goi y:
+
+```bash
+git commit -m "feat: add chatbot baseline and tool specs"
+```
+
+### Moc 3 - ReAct Loop & Safeguards (60 phut)
+
+Muc tieu: lap Agent co vong lap `Thought -> Action -> Observation`, co guardrail va chay test.
+
+| Thanh vien | Can lam | Output can co |
+| :--- | :--- | :--- |
+| TV1 | Chay/doi chieu test cases, ghi ket qua pass/fail va trace mau | `docs/trace_eval.md` co trace cua it nhat 1 case multi-step va 1 edge case |
+| TV2 | Hoan thien tool implementation va dang ky vao `AVAILABLE_TOOLS` | `src/tools.py` co it nhat 3 tool chay duoc, khong crash khi input sai |
+| TV3 | Hoan thien ReAct prompt va guardrails | `src/prompts.py` co `REACT_SYSTEM_PROMPT`, `MAX_ITERATIONS`, quy tac fallback |
+| TV4 | Lap ReAct loop, parse Action, goi tool, chen Observation, in Final Answer | `src/app.py` chay duoc baseline va ReAct agent tren test cases |
+
+Output chung cua Moc 3:
+
+- `python3 src/app.py` chay duoc.
+- Agent goi dung tool theo cau hoi.
+- Co phanh `MAX_ITERATIONS`.
+- Co log trace trong `docs/trace_eval.md`.
+
+Commit goi y:
+
+```bash
+git commit -m "feat: add react agent loop and safeguards"
+```
+
+### Moc 4 - Tuong tac lien nhom & Hybrid Pattern (40 phut)
+
+Muc tieu: test cheo, sua loi cuoi va ve flowchart chatbot/agent.
+
+| Thanh vien | Can lam | Output can co |
+| :--- | :--- | :--- |
+| TV1 | Dung test case cua nhom minh de tan cong nhom khac; ghi nhan ket qua | `docs/trace_eval.md` co muc Cross-Audit va nhan xet pass/fail |
+| TV2 | Sua tool neu bi hoi cau bay lam loi | `src/tools.py` xu ly duoc mon khong ton tai, thieu tien quyet, qua tai tin chi |
+| TV3 | Sua prompt/guardrail neu agent doan bua hoac lap vo han | `src/prompts.py` co fallback lich su va quy tac khong tu van sai dieu kien |
+| TV4 | Ve flowchart va chay demo ban cuoi | `docs/hybrid_flowchart.mermaid`, app demo duoc 3 case chinh |
+
+Output chung cua Moc 4:
+
+- Co bien ban cross-audit trong `docs/trace_eval.md`.
+- Co `docs/hybrid_flowchart.mermaid`.
+- Demo duoc 1 case don gian, 1 case multi-step, 1 edge case.
+- Tat ca branch da merge vao `main`.
+
+Commit goi y:
+
+```bash
+git commit -m "docs: add cross audit and hybrid flowchart"
+```
+
+---
+
+## 7. Tieu chi hoan thanh
+
+Project duoc xem la hoan chinh khi:
+
+- `python src/app.py` chay duoc.
+- Co it nhat 5 test cases dung chu de tu van khoa hoc.
+- Co it nhat 3 tool trong `src/tools.py`.
+- Prompt bat dung format ReAct.
+- Co guardrail chong vong lap vo han.
+- Co bao cao trace trong `docs/trace_eval.md`.
+- Tat ca code da merge vao `main`.
+- Repo khong chua secret/API key.

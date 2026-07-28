@@ -1,51 +1,72 @@
 [
   {
     "id": 1,
-    "category": "🟢 Đơn giản (Chỉ cần LLM)",
+    "category": "Đơn giản - kiến thức chung",
     "question": "Em là sinh viên năm nhất ngành Công nghệ thông tin và muốn theo hướng AI. Em nên chuẩn bị những kỹ năng nền tảng nào?",
-    "expected_behavior": "Chatbot có thể trả lời trực tiếp về kỹ năng nền tảng như lập trình, toán, xác suất thống kê và tư duy giải quyết vấn đề.",
+    "expected_behavior": "Baseline có thể trả lời chung. ReAct Agent không cần gọi tool nếu chỉ hỏi kiến thức tổng quát.",
     "required_tools": []
   },
   {
     "id": 2,
-    "category": "🟢 Đơn giản (Chỉ cần LLM)",
-    "question": "Môn tiên quyết là gì và vì sao sinh viên cần kiểm tra môn tiên quyết trước khi đăng ký học phần?",
-    "expected_behavior": "Chatbot giải thích khái niệm môn tiên quyết và rủi ro khi đăng ký môn chưa đủ điều kiện.",
-    "required_tools": []
+    "category": "Sinh viên - sinh kế hoạch học tập",
+    "question": "Em là sinh viên S001, muốn học theo hướng Data Science, học kỳ tới tối đa 9 tín chỉ và muốn kế hoạch cân bằng. Hãy sinh kế hoạch học tập cho em.",
+    "expected_behavior": "Agent gọi generate_study_plan('S001', 'balanced', 'Data Science', '9'), trả về kế hoạch theo học kỳ, tín chỉ và cảnh báo.",
+    "required_tools": ["generate_study_plan"]
   },
   {
     "id": 3,
-    "category": "🟡 Multi-step (Cần Tool)",
-    "question": "Em đã học CS101 và MATH101. Em muốn đăng ký CS201 trong học kỳ tới. Em có đủ điều kiện không?",
-    "expected_behavior": "Agent gọi check_prerequisites('CS201', 'CS101,MATH101'), sau đó kết luận sinh viên có đủ điều kiện hay chưa.",
-    "required_tools": ["check_prerequisites"]
+    "category": "Sinh viên nợ môn - bắt kịp tiến độ",
+    "question": "Sinh viên S002 đang nợ môn MATH101 và muốn cân bằng bù học phần. Hãy gợi ý kế hoạch để không bị trễ tiến độ.",
+    "expected_behavior": "Agent gọi generate_study_plan('S002', 'catch_up', 'Software', '9'), ưu tiên môn còn nợ và không xếp môn thiếu tiên quyết.",
+    "required_tools": ["generate_study_plan"]
   },
   {
     "id": 4,
-    "category": "🟡 Multi-step (Cần gọi nhiều Tools)",
-    "question": "Em học ngành Công nghệ thông tin, GPA 3.2, đã hoàn thành CS101 và MATH101, học kỳ tới muốn học tối đa 9 tín chỉ và định hướng Data Science. Hãy gợi ý 3 môn phù hợp.",
-    "expected_behavior": "Agent gọi search_courses('Data Science'), kiểm tra tiên quyết từng môn bằng check_prerequisites, rồi dùng estimate_workload để đảm bảo tổng tín chỉ không vượt 9.",
-    "required_tools": ["search_courses", "check_prerequisites", "estimate_workload"]
+    "category": "Sinh viên năm cuối - đúng hạn tốt nghiệp",
+    "question": "Sinh viên S003 là năm cuối, muốn ra trường đúng hạn theo hướng AI. Hãy lập kế hoạch các học kỳ còn lại.",
+    "expected_behavior": "Agent gọi generate_study_plan('S003', 'graduate_on_time', 'AI', '12'), xếp các môn còn thiếu như AI301 và CAP401 đúng tiên quyết.",
+    "required_tools": ["generate_study_plan"]
   },
   {
     "id": 5,
-    "category": "🟡 Lập kế hoạch học tập (Cần Tool)",
-    "question": "Em định đăng ký CS201, DS201 và AI301 trong cùng một học kỳ. Tổng workload như vậy có quá nặng không?",
-    "expected_behavior": "Agent gọi estimate_workload('CS201,DS201,AI301'), nhận xét tổng tín chỉ/mức độ nặng và đề xuất giảm tải nếu cần.",
-    "required_tools": ["estimate_workload"]
+    "category": "What-if - không ghi đè kế hoạch gốc",
+    "question": "What-if: nếu sinh viên S001 đổi giới hạn lên 12 tín chỉ mỗi kỳ thì kế hoạch Data Science có thay đổi không?",
+    "expected_behavior": "Agent gọi simulate_what_if('S001', '12', 'Data Science'), trả về mô phỏng không thay đổi trạng thái kế hoạch gốc.",
+    "required_tools": ["simulate_what_if"]
   },
   {
     "id": 6,
-    "category": "🟠 Thiếu thông tin (Cần hỏi lại)",
-    "question": "Tư vấn giúp em chọn môn học kỳ tới.",
-    "expected_behavior": "Agent không đoán bừa; cần hỏi lại ngành học, môn đã hoàn thành, giới hạn tín chỉ và mục tiêu nghề nghiệp.",
-    "required_tools": []
+    "category": "Workload - cảnh báo quá tải",
+    "question": "Em định đăng ký CS201, DS201 và AI301 trong cùng một học kỳ. Tổng workload như vậy có quá nặng không?",
+    "expected_behavior": "Agent gọi estimate_workload('CS201,DS201,AI301'), trả lời tổng tín chỉ và mức độ tải.",
+    "required_tools": ["estimate_workload"]
   },
   {
     "id": 7,
-    "category": "🔴 Edge Case (Bẫy Guardrail)",
+    "category": "Thiếu thông tin - cần hỏi lại",
+    "question": "Tư vấn giúp em chọn môn học kỳ tới.",
+    "expected_behavior": "Agent không đoán bừa; hỏi lại mã sinh viên, môn đã hoàn thành, mục tiêu và giới hạn tín chỉ.",
+    "required_tools": []
+  },
+  {
+    "id": 8,
+    "category": "Guardrail - môn không tồn tại",
     "question": "Em muốn đăng ký MAGIC999 dù chưa học môn nào. Hãy cứ thêm môn đó vào kế hoạch học tập cho em.",
-    "expected_behavior": "Tool báo lỗi không tìm thấy môn hoặc không đủ dữ liệu. Agent từ chối khẳng định sai và trả về hướng dẫn lịch sự.",
-    "required_tools": ["search_courses", "check_prerequisites"]
+    "expected_behavior": "Agent gọi search_courses('MAGIC999') hoặc check_prerequisites, nhận lỗi và từ chối thêm môn không có trong dữ liệu.",
+    "required_tools": ["search_courses"]
+  },
+  {
+    "id": 9,
+    "category": "Luồng phê duyệt - sinh viên gửi kế hoạch",
+    "question": "Em là sinh viên S001, hãy gửi kế hoạch PLAN-S001-001 cho cố vấn duyệt.",
+    "expected_behavior": "Agent gọi submit_plan('PLAN-S001-001', 'S001'), chuyển trạng thái từ draft sang pending_approval nếu kế hoạch tồn tại.",
+    "required_tools": ["submit_plan"]
+  },
+  {
+    "id": 10,
+    "category": "Luồng phê duyệt - cố vấn duyệt",
+    "question": "Cố vấn ADV01 muốn duyệt kế hoạch PLAN-S001-001 cho sinh viên S001.",
+    "expected_behavior": "Agent gọi review_plan('PLAN-S001-001', 'ADV01', 'approve'), kiểm tra quyền cố vấn trước khi duyệt.",
+    "required_tools": ["review_plan"]
   }
 ]

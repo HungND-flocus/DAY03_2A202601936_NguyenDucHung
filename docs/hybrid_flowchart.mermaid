@@ -1,0 +1,38 @@
+flowchart TD
+    U[Student / Advisor question] --> R{Need validated academic data?}
+
+    R -->|No, general advice| B[Baseline Chatbot Path]
+    B --> BF[Answer general study guidance]
+
+    R -->|Yes| G{Guardrail scope check}
+    G -->|Missing profile info| Q[Ask for student id, completed courses, goal, credit limit]
+    G -->|Out of academic scope| O[Refuse briefly and redirect to academic advising]
+    G -->|In scope| A[ReAct Agent Path]
+
+    A --> T{Choose tool}
+    T --> C[get_student_context]
+    T --> S[search_courses]
+    T --> P[check_prerequisites]
+    T --> W[estimate_workload]
+    T --> PL[generate_study_plan / simulate_what_if]
+    T --> SUB[submit_plan]
+    T --> REV[review_plan]
+
+    C --> OBS[Observation from validated backend data]
+    S --> OBS
+    P --> OBS
+    W --> OBS
+    PL --> OBS
+    SUB --> OBS
+    REV --> OBS
+
+    OBS --> OK{Observation ok?}
+    OK -->|No| SAFE[Explain error, do not invent course/plan]
+    OK -->|Yes| F[Final Answer with reasons, warnings, next action]
+
+    PL --> DRAFT[Plan status: draft]
+    DRAFT --> SUBMIT[Student submits plan]
+    SUBMIT --> PENDING[Plan status: pending_approval]
+    PENDING --> DECIDE{Advisor decision}
+    DECIDE --> APPROVED[approved]
+    DECIDE --> REJECTED[rejected]

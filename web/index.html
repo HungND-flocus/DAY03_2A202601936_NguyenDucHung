@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AI Academic Advisor</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div>
+          <p class="eyebrow">Academic Portal</p>
+          <h1>AI Academic Advisor</h1>
+        </div>
+
+        <label>
+          Trường
+          <select id="schoolSelect"></select>
+        </label>
+
+        <label>
+          Mẫu nhanh
+          <select id="studentSelect"></select>
+        </label>
+
+        <div class="student-snapshot" id="studentSnapshot"></div>
+
+        <label>
+          Tên sinh viên
+          <input id="studentNameInput" placeholder="Nhập tên sinh viên" />
+        </label>
+
+        <label>
+          Chương trình đang học
+          <select id="programSelect"></select>
+        </label>
+
+        <label>
+          Năm học hiện hành
+          <select id="currentYearSelect">
+            <option value="1">Năm 1</option>
+            <option value="2">Năm 2</option>
+            <option value="3">Năm 3</option>
+            <option value="4">Năm 4</option>
+          </select>
+        </label>
+
+        <label>
+          GPA hiện tại
+          <input id="gpaInput" type="number" min="0" max="4" step="0.1" />
+        </label>
+
+        <label>
+          Mục tiêu
+          <select id="goalSelect">
+            <option value="balanced">Cân bằng khối lượng</option>
+            <option value="graduate_on_time">Ra trường đúng hạn</option>
+            <option value="catch_up">Củng cố nền</option>
+            <option value="accelerate">Tăng tốc</option>
+          </select>
+        </label>
+
+        <label>
+          Định hướng
+          <select id="trackSelect">
+            <option>Data Science</option>
+            <option>AI</option>
+            <option>Software</option>
+          </select>
+        </label>
+
+        <label>
+          Sở thích cá nhân
+          <input id="interestsInput" placeholder="AI, research, backend" />
+        </label>
+
+        <label>
+          Môn đã hoàn thành
+          <input id="completedInput" placeholder="IT001, MA003, MA004" />
+        </label>
+
+        <label>
+          Môn cần lưu ý / muốn học lại
+          <input id="failedInput" placeholder="CS106, CS114" />
+        </label>
+
+        <div class="field-row">
+          <label>
+            Tín chỉ/kỳ
+            <input id="creditsInput" type="number" min="6" max="18" value="12" />
+          </label>
+          <label>
+            Số năm
+            <input id="yearsInput" type="number" min="1" max="6" value="4" />
+          </label>
+        </div>
+
+        <button id="generateBtn" class="primary">Sinh lộ trình</button>
+        <button id="submitBtn">Gửi cố vấn</button>
+        <button id="approveBtn">Cố vấn duyệt</button>
+      </aside>
+
+      <main>
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Elective Planner + LLM Guardrails</p>
+            <h2>Lộ trình môn tự chọn theo từng năm</h2>
+          </div>
+          <div class="status-pill" id="planStatus">Chưa có kế hoạch</div>
+        </header>
+
+        <section class="summary-band">
+          <div>
+            <span>Risk</span>
+            <strong id="riskMetric">-</strong>
+          </div>
+          <div>
+            <span>GPA</span>
+            <strong id="gpaMetric">-</strong>
+          </div>
+          <div>
+            <span>Plan ID</span>
+            <strong id="planMetric">-</strong>
+          </div>
+          <div>
+            <span>Max credits</span>
+            <strong id="creditMetric">-</strong>
+          </div>
+        </section>
+
+        <section class="analysis-panel">
+          <h3>Nhận xét AI</h3>
+          <p id="analysisText">Nhập hồ sơ sinh viên và sinh lộ trình để xem phân tích môn tự chọn.</p>
+        </section>
+
+        <section class="workspace">
+          <div class="roadmap-column">
+            <div class="section-title">
+              <h3>Roadmap</h3>
+              <span id="alertCount">0 cảnh báo</span>
+            </div>
+            <div class="timeline" id="timeline"></div>
+          </div>
+
+          <div class="chat-column">
+            <div class="section-title">
+              <h3>Catalog</h3>
+              <span>Mô tả môn học</span>
+            </div>
+            <form id="catalogForm" class="chat-form catalog-form">
+              <input id="catalogInput" placeholder="Tìm: máy học, ERP, GIS, bảo mật..." />
+              <button>Tìm</button>
+            </form>
+            <div class="catalog-results" id="catalogResults"></div>
+
+            <div class="section-title">
+              <h3>AI Chat</h3>
+              <span>Plan-aware</span>
+            </div>
+            <div class="chat-log" id="chatLog"></div>
+            <form id="chatForm" class="chat-form">
+              <input id="chatInput" placeholder="Ví dụ: Vì sao em nên học DS201 trước AI301?" />
+              <button>Gửi</button>
+            </form>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>
