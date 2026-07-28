@@ -1,21 +1,21 @@
 """
 🛠️ TOOL REGISTRY & SCHEMAS — Chủ đề: Trợ Lý Tư Vấn Khóa Học Sinh Viên
-Dành cho Role 2: Tool & Spec Engineer (Mốc 2: Chuẩn hóa Tool Specs & Docstrings)
+Dành cho Role 2: Tool & Spec Engineer
 
-Mốc 2 — Danh sách tool & Tool Specs đã chuẩn hóa:
-  1. search_courses          — Tìm khóa học theo từ khóa / ngành học
+Mốc 2 — Bổ sung Tool Specs, Docstrings chuẩn hóa cho ReAct Agent & khớp với Test Cases (Role 1):
+  1. search_courses          — Tìm khóa học theo từ khóa / ngành / định hướng (VD: 'Data Science', 'AI')
   2. check_prerequisites     — Kiểm tra điều kiện tiên quyết của môn học
-  3. estimate_workload       — Ước tính tổng tín chỉ & mức độ nặng
+  3. estimate_workload       — Ước tính tổng tín chỉ & mức độ nặng cho danh sách môn
   4. get_course_detail       — Xem chi tiết một môn học (mô tả, giảng viên, lịch)
   5. check_schedule_conflict — Kiểm tra xung đột lịch học giữa các môn
 
-Bổ sung Mốc 2:
-  - Helper chuẩn hóa mã môn: `_normalize_course_id("cs 301") -> "CS301"`
-  - Helper tự động tạo Tool Specs cho ReAct System Prompt: `get_tools_spec_prompt()`
+Quy tắc phanh an toàn (Guardrails / Error Handling):
+  - Khi tham số không hợp lệ, môn không tồn tại, hoặc dữ liệu rỗng:
+    Trả về string dạng "LỖI: ..." thay vì làm crash app Python (raise Exception).
 """
 
 # =============================================================================
-# 📚 DỮ LIỆU MẪU (Mock Data) — Dùng thay thế database thực tế
+# 📚 DỮ LIỆU MẪU (Mock Data) — Khớp với Test Cases trong config/test_cases.json
 # =============================================================================
 
 COURSE_DATABASE = {
@@ -27,7 +27,7 @@ COURSE_DATABASE = {
         "schedule": "Thứ 2 (7:30 - 9:30)",
         "instructor": "TS. Nguyễn Văn An",
         "description": "Giới thiệu tư duy lập trình và ngôn ngữ Python cơ bản.",
-        "majors": ["CNTT", "KHMT", "AI"],
+        "majors": ["CNTT", "KHMT", "AI", "Data Science"],
     },
     "CS201": {
         "name": "Cấu trúc Dữ liệu & Giải thuật",
@@ -37,17 +37,27 @@ COURSE_DATABASE = {
         "schedule": "Thứ 3 (9:30 - 11:30)",
         "instructor": "PGS. Trần Thị Bình",
         "description": "Stack, Queue, Tree, Graph và các thuật toán sắp xếp, tìm kiếm.",
-        "majors": ["CNTT", "KHMT", "AI"],
+        "majors": ["CNTT", "KHMT", "AI", "Data Science"],
     },
     "CS301": {
-        "name": "Trí tuệ Nhân tạo",
+        "name": "Trí tuệ Nhân tạo Cơ bản",
         "credits": 3,
         "difficulty": "Khó",
         "prerequisites": ["CS201", "MATH201"],
         "schedule": "Thứ 4 (13:30 - 15:30)",
         "instructor": "GS. Lê Quốc Cường",
-        "description": "Các thuật toán AI cổ điển, học máy cơ bản và ứng dụng thực tế.",
+        "description": "Các thuật toán AI cổ điển, biểu diễn tri thức và tìm kiếm không gian trạng thái.",
         "majors": ["AI", "CNTT"],
+    },
+    "AI301": {
+        "name": "Trí tuệ Nhân tạo Ứng dụng",
+        "credits": 3,
+        "difficulty": "Khó",
+        "prerequisites": ["CS201", "MATH201"],
+        "schedule": "Thứ 5 (9:30 - 11:30)",
+        "instructor": "GS. Lê Quốc Cường",
+        "description": "Môn nâng cao về AI, bao gồm các ứng dụng Học máy và Xử lý ngôn ngữ tự nhiên.",
+        "majors": ["AI", "CNTT", "Data Science"],
     },
     "CS302": {
         "name": "Học Máy (Machine Learning)",
@@ -57,7 +67,17 @@ COURSE_DATABASE = {
         "schedule": "Thứ 5 (7:30 - 9:30)",
         "instructor": "TS. Phạm Minh Đức",
         "description": "Supervised, Unsupervised Learning, Neural Networks.",
-        "majors": ["AI"],
+        "majors": ["AI", "Data Science"],
+    },
+    "DS201": {
+        "name": "Khai phá Dữ liệu & Data Science",
+        "credits": 3,
+        "difficulty": "Trung bình",
+        "prerequisites": ["CS101", "DB201"],
+        "schedule": "Thứ 4 (13:30 - 15:30)",
+        "instructor": "TS. Nguyễn Thị Thu",
+        "description": "Các kỹ thuật Khoa học Dữ liệu, Data Mining, xử lý dữ liệu lớn với Python Pandas, Scikit-Learn.",
+        "majors": ["Data Science", "CNTT", "AI"],
     },
     "MATH101": {
         "name": "Giải tích 1",
@@ -67,7 +87,7 @@ COURSE_DATABASE = {
         "schedule": "Thứ 2 (13:30 - 15:30)",
         "instructor": "TS. Hoàng Thị Lan",
         "description": "Giới hạn, đạo hàm, tích phân và ứng dụng.",
-        "majors": ["CNTT", "KHMT", "AI", "KT"],
+        "majors": ["CNTT", "KHMT", "AI", "KT", "Data Science"],
     },
     "MATH201": {
         "name": "Đại số Tuyến tính",
@@ -77,7 +97,7 @@ COURSE_DATABASE = {
         "schedule": "Thứ 6 (9:30 - 11:30)",
         "instructor": "PGS. Vũ Thanh Hà",
         "description": "Ma trận, không gian vector, trị riêng, vector riêng.",
-        "majors": ["CNTT", "KHMT", "AI"],
+        "majors": ["CNTT", "KHMT", "AI", "Data Science"],
     },
     "MATH202": {
         "name": "Xác suất & Thống kê",
@@ -87,7 +107,7 @@ COURSE_DATABASE = {
         "schedule": "Thứ 3 (13:30 - 15:30)",
         "instructor": "TS. Ngô Thị Mai",
         "description": "Lý thuyết xác suất, phân phối xác suất, kiểm định thống kê.",
-        "majors": ["AI", "CNTT", "KT"],
+        "majors": ["AI", "CNTT", "KT", "Data Science"],
     },
     "SE201": {
         "name": "Kỹ nghệ Phần mềm",
@@ -107,7 +127,7 @@ COURSE_DATABASE = {
         "schedule": "Thứ 5 (13:30 - 15:30)",
         "instructor": "TS. Chu Thị Hương",
         "description": "Mô hình quan hệ, SQL, thiết kế và tối ưu cơ sở dữ liệu.",
-        "majors": ["CNTT", "KHMT", "AI"],
+        "majors": ["CNTT", "KHMT", "AI", "Data Science"],
     },
     "NET201": {
         "name": "Mạng Máy tính",
@@ -126,38 +146,33 @@ MAX_CREDITS_PER_SEMESTER = 24
 
 
 # =============================================================================
-# 🛠️ HELPER FUNCTIONS (Chuẩn hóa dữ liệu đầu vào)
-# =============================================================================
-
-def _normalize_course_id(raw_id: str) -> str:
-    """
-    Chuẩn hóa mã môn học nhập vào (ví dụ: 'cs 101' -> 'CS101', 'math-201' -> 'MATH201').
-    """
-    if not raw_id:
-        return ""
-    cleaned = raw_id.upper().strip().replace(" ", "").replace("-", "")
-    return cleaned
-
-
-# =============================================================================
 # 🔧 TOOL 1: search_courses
 # =============================================================================
 
 def search_courses(keyword: str) -> str:
     """
-    Mô tả: Tìm kiếm các khóa học trong hệ thống theo từ khóa, tên môn, mã môn hoặc ngành học.
+    Tra cứu danh sách các khóa học phù hợp theo từ khóa, ngành học hoặc định hướng nghề nghiệp.
+
+    Mục đích cho Agent:
+        Dùng tool này để tìm các môn học thuộc một lĩnh vực (VD: 'Data Science', 'AI', 'Lập trình')
+        hoặc tìm mã môn chính xác dựa trên tên môn học mà sinh viên nhắc tới.
 
     Args:
-        keyword (str): Từ khóa cần tra cứu (Ví dụ: 'AI', 'CNTT', 'lập trình', 'CS101', 'toán').
+        keyword (str): Từ khóa tìm kiếm — có thể là tên môn, mã môn, ngành học, 
+                       hoặc định hướng nghề nghiệp (Ví dụ: 'Data Science', 'AI', 'CNTT', 'CS101', 'Toán').
 
     Returns:
-        str: Danh sách khóa học tìm thấy kèm thông tin cơ bản (mã, tên, tín chỉ, độ khó).
-             Nếu lỗi/rỗng/không tìm thấy, trả về chuỗi thông báo "LỖI: ...".
-    """
-    if not keyword or not keyword.strip():
-        return "LỖI: Từ khóa tìm kiếm không được để trống."
+        str: Chuỗi kết quả liệt kê các môn học khớp với từ khóa (mã môn, tên môn, tín chỉ, độ khó, ngành).
+             Nếu không tìm thấy hoặc input rỗng, trả về chuỗi thông báo "LỖI: ...".
 
-    kw = keyword.lower().strip()
+    Ví dụ ReAct Call:
+        Action: search_courses[Data Science]
+        Action: search_courses[CS101]
+    """
+    if not keyword or not str(keyword).strip():
+        return "LỖI: Từ khóa tìm kiếm không được để trống. Hãy cung cấp từ khóa như ngành học (CNTT, AI, Data Science) hoặc tên/mã môn."
+
+    kw = str(keyword).lower().strip()
     matched = []
 
     for course_id, info in COURSE_DATABASE.items():
@@ -170,16 +185,17 @@ def search_courses(keyword: str) -> str:
         ):
             matched.append(
                 f"  • [{course_id}] {info['name']} — {info['credits']} tín chỉ, "
-                f"Độ khó: {info['difficulty']}, Ngành: {', '.join(info['majors'])}"
+                f"Độ khó: {info['difficulty']}, Ngành: {', '.join(info['majors'])}\n"
+                f"    Mô tả: {info['description']}"
             )
 
     if not matched:
         return (
             f"LỖI: Không tìm thấy môn học nào khớp với từ khóa '{keyword}'. "
-            f"Gợi ý từ khóa hợp lệ: 'AI', 'CNTT', 'KHMT', 'lập trình', 'toán', 'CS101'."
+            f"Gợi ý: Hãy thử các từ khóa phổ biến như 'CNTT', 'AI', 'Data Science', 'Lập trình', 'Toán', 'CS101'."
         )
 
-    result_lines = [f"📚 Kết quả tìm kiếm cho '{keyword}' ({len(matched)} môn):"]
+    result_lines = [f"📚 Kết quả tìm kiếm khóa học cho từ khóa '{keyword}' ({len(matched)} môn phù hợp):"]
     result_lines.extend(matched)
     return "\n".join(result_lines)
 
@@ -190,46 +206,53 @@ def search_courses(keyword: str) -> str:
 
 def check_prerequisites(course_id: str, completed_courses: str = "") -> str:
     """
-    Mô tả: Kiểm tra sinh viên đã đạt đủ điều kiện môn tiên quyết để đăng ký môn học hay chưa.
+    Kiểm tra điều kiện tiên quyết xem sinh viên đã đủ điều kiện đăng ký học phần hay chưa.
+
+    Mục đích cho Agent:
+        Dùng tool này trước khi gợi ý đăng ký một môn học để đảm bảo sinh viên không bị thiếu môn tiên quyết.
 
     Args:
-        course_id (str): Mã môn học cần kiểm tra đăng ký (Ví dụ: 'CS301', 'CS201').
-        completed_courses (str): Danh sách mã môn đã hoàn thành, phân cách bởi dấu phẩy
-                                 (Ví dụ: 'CS101, MATH101, MATH201'). Mặc định rỗng.
+        course_id (str): Mã môn học sinh viên muốn đăng ký (Ví dụ: 'CS201', 'CS301', 'DS201').
+        completed_courses (str): Danh sách mã các môn sinh viên đã học xong, phân cách bởi dấu phẩy
+                                 (Ví dụ: 'CS101,MATH101' hoặc '' nếu chưa học môn nào).
 
     Returns:
-        str: Báo cáo kết quả ✅ ĐỦ ĐIỀU KIỆN hoặc ❌ THIẾU MÔN TIÊN QUYẾT.
-             Nếu mã môn không tồn tại, trả về chuỗi "LỖI: ...".
+        str: Kết quả xác nhận ĐỦ điều kiện đăng ký hoặc liệt kê cụ thể các môn tiên quyết còn THIẾU.
+             Trả về chuỗi "LỖI: ..." nếu mã môn không tồn tại trong hệ thống.
+
+    Ví dụ ReAct Call:
+        Action: check_prerequisites[CS201, CS101]
+        Action: check_prerequisites[CS301, CS101,MATH101]
     """
-    if not course_id or not course_id.strip():
-        return "LỖI: Mã môn học không được để trống."
+    if not course_id or not str(course_id).strip():
+        return "LỖI: Tham số course_id không được để trống. Hãy truyền mã môn học cần kiểm tra."
 
-    cid_norm = _normalize_course_id(course_id)
+    course_id = str(course_id).strip().upper()
 
-    if cid_norm not in COURSE_DATABASE:
+    if course_id not in COURSE_DATABASE:
         return (
             f"LỖI: Mã môn học '{course_id}' không tồn tại trong hệ thống. "
-            f"Hãy dùng tool search_courses để tra cứu mã môn chính xác."
+            f"Vui lòng sử dụng tool search_courses để tra cứu mã môn chính xác."
         )
 
-    required = COURSE_DATABASE[cid_norm]["prerequisites"]
+    required = COURSE_DATABASE[course_id]["prerequisites"]
 
     if not required:
-        return f"✅ Môn [{cid_norm}] {COURSE_DATABASE[cid_norm]['name']} không yêu cầu môn tiên quyết. Sinh viên có thể đăng ký ngay!"
+        return f"✅ Môn [{course_id}] {COURSE_DATABASE[course_id]['name']} KHÔNG có môn tiên quyết — Sinh viên có thể đăng ký ngay!"
 
-    # Chuẩn hóa danh sách môn đã học
-    if not completed_courses or not completed_courses.strip():
+    # Chuẩn hóa danh sách môn đã hoàn thành
+    if not completed_courses or not str(completed_courses).strip():
         done = set()
     else:
-        done = {_normalize_course_id(c) for c in completed_courses.split(",") if c.strip()}
+        done = {c.strip().upper() for c in str(completed_courses).split(",") if c.strip()}
 
     missing = [r for r in required if r not in done]
-    course_name = COURSE_DATABASE[cid_norm]["name"]
+    course_name = COURSE_DATABASE[course_id]["name"]
 
     if not missing:
         return (
-            f"✅ ĐỦ ĐIỀU KIỆN đăng ký [{cid_norm}] {course_name}!\n"
-            f"   Các môn tiên quyết đã học: {', '.join(required)}"
+            f"✅ ĐỦ ĐIỀU KIỆN! Sinh viên có thể đăng ký môn [{course_id}] {course_name}.\n"
+            f"   Môn tiên quyết đã hoàn thành: {', '.join(required)}"
         )
     else:
         missing_detail = []
@@ -239,9 +262,9 @@ def check_prerequisites(course_id: str, completed_courses: str = "") -> str:
             else:
                 missing_detail.append(m)
         return (
-            f"❌ CHƯA ĐỦ ĐIỀU KIỆN đăng ký [{cid_norm}] {course_name}.\n"
-            f"   Môn tiên quyết còn thiếu: {', '.join(missing_detail)}\n"
-            f"   Gợi ý: Sinh viên cần học và vượt qua các môn trên trước khi đăng ký môn này."
+            f"❌ CHƯA ĐỦ ĐIỀU KIỆN đăng ký môn [{course_id}] {course_name}.\n"
+            f"   Các môn tiên quyết còn THIẾU: {', '.join(missing_detail)}\n"
+            f"   Gợi ý: Sinh viên cần đăng ký và hoàn thành các môn thiếu trên trước."
         )
 
 
@@ -251,61 +274,69 @@ def check_prerequisites(course_id: str, completed_courses: str = "") -> str:
 
 def estimate_workload(course_ids: str) -> str:
     """
-    Mô tả: Ước tính tổng số tín chỉ và đánh giá mức độ nặng/nhẹ của danh sách môn học dự định đăng ký.
+    Ước tính tổng số tín chỉ, kiểm tra giới hạn tín chỉ và phân tích mức độ học tập cho danh sách môn dự định đăng ký.
+
+    Mục đích cho Agent:
+        Dùng tool này để đảm bảo kế hoạch học tập không bị quá tải hoặc vượt số tín chỉ tối đa sinh viên yêu cầu.
 
     Args:
-        course_ids (str): Danh sách mã các môn dự định đăng ký, phân cách bởi dấu phẩy
-                          (Ví dụ: 'CS101, MATH101, SE201').
+        course_ids (str): Danh sách mã các môn học định đăng ký, phân cách bằng dấu phẩy
+                          (Ví dụ: 'CS101,MATH101,SE201' hoặc 'CS201,DS201,AI301').
 
     Returns:
-        str: Tổng số tín chỉ, mức độ học tập (🟢 Nhẹ / 🟡 Vừa / 🟠 Nặng / 🔴 Quá tải),
-             và lời khuyên điều chỉnh. Trả về "LỖI: ..." nếu dữ liệu rỗng.
-    """
-    if not course_ids or not course_ids.strip():
-        return "LỖI: Vui lòng cung cấp danh sách ít nhất một mã môn học."
+        str: Bảng phân tích khối lượng: Tổng tín chỉ, danh sách môn, độ khó, mức độ tải 
+             (🟢 Nhẹ / 🟡 Vừa / 🟠 Nặng / 🔴 Quá tải) và cảnh báo vượt giới hạn.
+             Trả về "LỖI: ..." nếu tham số rỗng hoặc không có môn hợp lệ.
 
-    raw_list = [c.strip() for c in course_ids.split(",") if c.strip()]
-    if not raw_list:
-        return "LỖI: Danh sách môn học không hợp lệ."
+    Ví dụ ReAct Call:
+        Action: estimate_workload[CS201,DS201,AI301]
+    """
+    if not course_ids or not str(course_ids).strip():
+        return "LỖI: Tham số course_ids không được để trống. Hãy cung cấp ít nhất một mã môn học."
+
+    ids = [c.strip().upper() for c in str(course_ids).split(",") if c.strip()]
+
+    if not ids:
+        return "LỖI: Danh sách mã môn học không hợp lệ."
 
     total_credits = 0
     hard_count = 0
     valid_courses = []
     invalid_ids = []
 
-    for raw in raw_list:
-        cid = _normalize_course_id(raw)
+    for cid in ids:
         if cid not in COURSE_DATABASE:
-            invalid_ids.append(raw)
+            invalid_ids.append(cid)
         else:
             info = COURSE_DATABASE[cid]
             total_credits += info["credits"]
-            valid_courses.append(f"  • [{cid}] {info['name']} — {info['credits']} TC (Độ khó: {info['difficulty']})")
+            valid_courses.append(f"  • [{cid}] {info['name']} — {info['credits']} tín chỉ (Độ khó: {info['difficulty']})")
             if info["difficulty"] == "Khó":
                 hard_count += 1
 
-    lines = ["📊 Ước tính khối lượng học tập:"]
-    lines.append(f"Danh sách môn hợp lệ ({len(valid_courses)} môn):")
+    lines = ["📊 ĐÁNH GIÁ KHỐI LƯỢNG HỌC TẬP (WORKLOAD ESTIMATION):"]
+    lines.append(f"Các môn lựa chọn ({len(valid_courses)} môn):")
     lines.extend(valid_courses)
 
     if invalid_ids:
-        lines.append(f"\n⚠️ Mã môn không hợp lệ/không thấy: {', '.join(invalid_ids)} (bỏ qua khi tính).")
+        lines.append(f"\n⚠️  Cảnh báo: Mã môn không tồn tại trong hệ thống: {', '.join(invalid_ids)} (bỏ qua khi tính tín chỉ).")
 
-    lines.append(f"\nTổng số tín chỉ: {total_credits} TC / {MAX_CREDITS_PER_SEMESTER} TC tối đa một học kỳ.")
+    lines.append(f"\nTổng số tín chỉ: {total_credits} TC (Tối đa quy định: {MAX_CREDITS_PER_SEMESTER} TC).")
 
-    # Đánh giá mức độ tải
+    # Đánh giá phân mức
     if total_credits > MAX_CREDITS_PER_SEMESTER:
-        level = "🔴 QUÁ TẢI — Vượt quá giới hạn tín chỉ cho phép!"
+        level = "🔴 QUÁ TẢI — Vượt quá giới hạn tín chỉ cho phép của học kỳ!"
         lines.append(f"Mức độ: {level}")
-        lines.append(f"💡 Lời khuyên: Sinh viên cần rút bớt ít nhất {total_credits - MAX_CREDITS_PER_SEMESTER} tín chỉ để đúng quy chế.")
+        lines.append(f"💡 Đề xuất: Cần loại bỏ ít nhất {total_credits - MAX_CREDITS_PER_SEMESTER} tín chỉ để tuân thủ quy chế.")
     elif total_credits >= 18 or hard_count >= 2:
-        level = "🟠 Nặng — Áp lực học tập cao, cần quản lý thời gian tốt."
+        level = "🟠 NẶNG — Khối lượng học tập cao (nhiều môn khó/nhiều tín chỉ)."
         lines.append(f"Mức độ: {level}")
+        lines.append("💡 Đề xuất: Sinh viên cần phân bổ thời gian học hợp lý.")
     elif total_credits >= 12:
-        level = "🟡 Vừa phải — Khối lượng cân bằng, phù hợp số đông sinh viên."
+        level = "🟡 VỪA PHẢI — Cân bằng tốt giữa việc học và các hoạt động khác."
         lines.append(f"Mức độ: {level}")
     else:
-        level = "🟢 Nhẹ — Phù hợp học kỳ cải thiện hoặc tập trung môn khó."
+        level = "🟢 NHẸ — Khối lượng vừa sức, dễ đạt kết quả cao."
         lines.append(f"Mức độ: {level}")
 
     return "\n".join(lines)
@@ -317,37 +348,47 @@ def estimate_workload(course_ids: str) -> str:
 
 def get_course_detail(course_id: str) -> str:
     """
-    Mô tả: Trích xuất thông tin chi tiết đầy đủ của một môn học (tín chỉ, giảng viên, lịch học, mô tả,...).
+    Truy xuất toàn bộ thông tin chi tiết của một mã môn học cụ thể.
+
+    Mục đích cho Agent:
+        Dùng tool này khi sinh viên hỏi sâu về một môn học cụ thể (mô tả môn, giảng viên dạy, lịch học, độ khó).
 
     Args:
-        course_id (str): Mã môn học cần xem chi tiết (Ví dụ: 'CS301', 'MATH101').
+        course_id (str): Mã môn học cần xem thông tin (Ví dụ: 'CS201', 'MATH101', 'DS201').
 
     Returns:
-        str: Toàn bộ hồ sơ chi tiết môn học. Trả về "LỖI: ..." nếu không tìm thấy môn.
+        str: Thông tin đầy đủ gồm Tên, Mã, Tín chỉ, Độ khó, Tiên quyết, Lịch học, Giảng viên, Ngành học & Mô tả.
+             Trả về "LỖI: ..." nếu mã môn không tồn tại.
+
+    Ví dụ ReAct Call:
+        Action: get_course_detail[CS201]
     """
-    if not course_id or not course_id.strip():
-        return "LỖI: Mã môn học không được để trống."
+    if not course_id or not str(course_id).strip():
+        return "LỖI: Tham số course_id không được để trống. Hãy truyền mã môn học cần xem chi tiết."
 
-    cid_norm = _normalize_course_id(course_id)
+    course_id = str(course_id).strip().upper()
 
-    if cid_norm not in COURSE_DATABASE:
+    if course_id not in COURSE_DATABASE:
         return (
-            f"LỖI: Không tìm thấy mã môn '{course_id}'. "
-            f"Vui lòng kiểm tra lại hoặc dùng search_courses để tìm mã đúng."
+            f"LỖI: Mã môn học '{course_id}' không tồn tại. "
+            f"Vui lòng dùng tool search_courses để tra cứu mã môn chính xác."
         )
 
-    info = COURSE_DATABASE[cid_norm]
-    prereq_str = ", ".join(info["prerequisites"]) if info["prerequisites"] else "Không có"
+    info = COURSE_DATABASE[course_id]
+    prereq_str = (
+        ", ".join(info["prerequisites"]) if info["prerequisites"] else "Không có"
+    )
 
     return (
-        f"📖 Chi tiết môn học [{cid_norm}]:\n"
-        f"  • Tên môn    : {info['name']}\n"
+        f"📖 THÔNG TIN CHI TIẾT MÔN HỌC:\n"
+        f"  • Mã môn học : {course_id}\n"
+        f"  • Tên môn học: {info['name']}\n"
         f"  • Số tín chỉ : {info['credits']} TC\n"
-        f"  • Độ khó     : {info['difficulty']}\n"
+        f"  • Mức độ khó : {info['difficulty']}\n"
         f"  • Tiên quyết : {prereq_str}\n"
         f"  • Lịch học   : {info['schedule']}\n"
         f"  • Giảng viên : {info['instructor']}\n"
-        f"  • Dành cho   : Ngành {', '.join(info['majors'])}\n"
+        f"  • Dành cho   : {', '.join(info['majors'])}\n"
         f"  • Mô tả môn  : {info['description']}"
     )
 
@@ -358,59 +399,69 @@ def get_course_detail(course_id: str) -> str:
 
 def check_schedule_conflict(course_ids: str) -> str:
     """
-    Mô tả: Kiểm tra xem danh sách môn học dự định đăng ký có bị xung đột (trùng) lịch học hay không.
+    Kiểm tra xem các môn học sinh viên có ý định chọn có bị xung đột (trùng) lịch học với nhau hay không.
+
+    Mục đích cho Agent:
+        Dùng tool này để đảm bảo các môn trong kế hoạch đăng ký học tập không bị trùng giờ học.
 
     Args:
-        course_ids (str): Danh sách mã môn cần kiểm tra, phân cách bởi dấu phẩy
-                          (Ví dụ: 'CS101, MATH101, CS201').
+        course_ids (str): Danh sách mã các môn học phân cách bằng dấu phẩy
+                          (Ví dụ: 'CS101,MATH101,CS201').
 
     Returns:
-        str: Báo cáo trùng lịch chi tiết hoặc xác nhận không có trùng lịch. Trả về "LỖI: ..." nếu dữ liệu rỗng.
-    """
-    if not course_ids or not course_ids.strip():
-        return "LỖI: Vui lòng cung cấp danh sách ít nhất một mã môn học."
+        str: Báo cáo kiểm tra lịch học — Xác nhận hợp lệ hoặc chỉ rõ ca học bị trùng kèm mã các môn trùng.
+             Trả về "LỖI: ..." nếu tham số rỗng hoặc không hợp lệ.
 
-    raw_list = [c.strip() for c in course_ids.split(",") if c.strip()]
-    if not raw_list:
-        return "LỖI: Danh sách môn học không hợp lệ."
+    Ví dụ ReAct Call:
+        Action: check_schedule_conflict[CS101, MATH101]
+    """
+    if not course_ids or not str(course_ids).strip():
+        return "LỖI: Tham số course_ids không được để trống. Hãy truyền danh sách mã môn học."
+
+    ids = [c.strip().upper() for c in str(course_ids).split(",") if c.strip()]
+
+    if not ids:
+        return "LỖI: Danh sách môn học trống hoặc không hợp lệ."
 
     schedule_map: dict[str, list[str]] = {}
     invalid_ids = []
 
-    for raw in raw_list:
-        cid = _normalize_course_id(raw)
+    for cid in ids:
         if cid not in COURSE_DATABASE:
-            invalid_ids.append(raw)
+            invalid_ids.append(cid)
             continue
         slot = COURSE_DATABASE[cid]["schedule"]
         if slot not in schedule_map:
             schedule_map[slot] = []
         schedule_map[slot].append(cid)
 
-    lines = ["🗓️  Kiểm tra xung đột lịch học:"]
+    lines = ["🗓️  BÁO CÁO KIỂM TRA XUNG ĐỘT LỊCH HỌC:"]
 
     conflicts = {slot: cids for slot, cids in schedule_map.items() if len(cids) > 1}
 
     if invalid_ids:
-        lines.append(f"⚠️ Mã môn không tìm thấy: {', '.join(invalid_ids)} (bỏ qua).")
+        lines.append(f"⚠️  Mã môn không tồn tại trong hệ thống: {', '.join(invalid_ids)} (bỏ qua kiểm tra).")
 
     if not conflicts:
-        lines.append("✅ Không có xung đột lịch học — Sinh viên có thể đăng ký tất cả các môn trên!")
+        lines.append("✅ HỢP LỆ! Không có bất kỳ xung đột lịch học nào giữa các môn đã chọn.")
+        lines.append("Chi tiết thời khóa biểu:")
         for slot, cids in sorted(schedule_map.items()):
             cid = cids[0]
             lines.append(f"   • {slot}: [{cid}] {COURSE_DATABASE[cid]['name']}")
     else:
-        lines.append("❌ BÁO ĐỘNG: Phát hiện xung đột lịch học giữa các môn:")
+        lines.append("❌ PHÁT HIỆN XUNG ĐỘT LỊCH HỌC!")
         for slot, cids in conflicts.items():
-            names = " & ".join(f"[{c}] {COURSE_DATABASE[c]['name']}" for c in cids)
-            lines.append(f"   ⛔ Ka học {slot} -> {names} bị TRÙNG LỊCH!")
-        lines.append("💡 Lời khuyên: Sinh viên chọn thay thế 1 trong các môn bị trùng ca trên.")
+            names = " & ".join(
+                f"[{c}] {COURSE_DATABASE[c]['name']}" for c in cids
+            )
+            lines.append(f"   ⛔ Khung giờ {slot} → Môn {names} bị TRÙNG LỊCH!")
+        lines.append("💡 Đề xuất: Sinh viên cần chọn lớp/môn khác để tránh trùng lịch học.")
 
     return "\n".join(lines)
 
 
 # =============================================================================
-# 📋 REGISTER & TOOL SPECS PROMPT HELPER (Phục vụ Role 3 & Role 4)
+# 📋 ĐĂNG KÝ TOOL REGISTRY — ReAct Agent sẽ tra bảng này để gọi hàm
 # =============================================================================
 
 AVAILABLE_TOOLS = {
@@ -420,15 +471,3 @@ AVAILABLE_TOOLS = {
     "get_course_detail": get_course_detail,
     "check_schedule_conflict": check_schedule_conflict,
 }
-
-
-def get_tools_spec_prompt() -> str:
-    """
-    Tự động sinh chuỗi định nghĩa Tool Specs để Role 3 (Prompt Engineer) dán vào 
-    REACT_SYSTEM_PROMPT trong file src/prompts.py.
-    """
-    specs = ["DANH SÁCH CÁC CÔNG CỤ (TOOLS) KHẢ DỤNG:"]
-    for name, func in AVAILABLE_TOOLS.items():
-        doc = func.__doc__.strip() if func.__doc__ else "Không có mô tả"
-        specs.append(f"\n--- Tool: {name} ---\n{doc}")
-    return "\n".join(specs)
