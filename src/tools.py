@@ -458,6 +458,35 @@ def check_schedule_conflict(course_ids: str) -> str:
     except Exception as e:
         return f"LỖI HỆ THỐNG khi xử lý check_schedule_conflict('{course_ids}'): {str(e)}"
 
+# =============================================================================
+# 🔧 TOOL 6: evaluate_gpa
+# =============================================================================
+def evaluate_gpa(gpa_str: str) -> str:
+    """
+    Xếp loại học lực dựa trên điểm GPA hệ 4.0.
+    """
+    try:
+        gpa = float(_clean_input_string(gpa_str))
+        if gpa < 0 or gpa > 4.0:
+            return "LỖI: GPA phải nằm trong khoảng từ 0.0 đến 4.0."
+        
+        if gpa >= 3.6:
+            rank = "Xuất sắc"
+        elif gpa >= 3.2:
+            rank = "Giỏi"
+        elif gpa >= 2.5:
+            rank = "Khá"
+        elif gpa >= 2.0:
+            rank = "Trung bình"
+        else:
+            rank = "Yếu/Kém"
+            
+        return f"✅ Với GPA {gpa}/4.0, quy chế xếp loại học lực là: {rank}"
+    except ValueError:
+        return f"LỖI: '{gpa_str}' không phải là một số hợp lệ. Hãy truyền vào số (ví dụ: '3.65')."
+    except Exception as e:
+        return f"LỖI HỆ THỐNG khi xử lý evaluate_gpa('{gpa_str}'): {str(e)}"
+
 
 # =============================================================================
 # 📋 ĐĂNG KÝ TOOL — Agent sẽ tra bảng này để gọi tool
@@ -469,4 +498,5 @@ AVAILABLE_TOOLS = {
     "estimate_workload": estimate_workload,
     "get_course_detail": get_course_detail,
     "check_schedule_conflict": check_schedule_conflict,
+    "evaluate_gpa": evaluate_gpa,
 }

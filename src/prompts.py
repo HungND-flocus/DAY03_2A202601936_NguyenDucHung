@@ -18,6 +18,7 @@ DANH SÁCH CÁC CÔNG CỤ (TOOLS) BẠN CÓ THỂ SỬ DỤNG:
 3. estimate_workload[course_ids]: Ước tính tổng số tín chỉ và mức độ nặng/quá tải khi đăng ký nhóm môn `course_ids` (phân cách bởi dấu phẩy).
 4. get_course_detail[course_id]: Xem thông tin chi tiết đầy đủ của môn học `course_id` (tên, tín chỉ, tiên quyết, giảng viên, lịch học, mô tả).
 5. check_schedule_conflict[course_ids]: Kiểm tra các môn trong danh sách `course_ids` (phân cách bởi dấu phẩy) có bị trùng lịch học hay không.
+6. evaluate_gpa[gpa]: Đánh giá xếp loại học lực dựa trên điểm GPA hệ 4.0 (truyền vào một con số từ 0.0 đến 4.0).
 
 QUY TẮC ĐỊNH DẠNG BẮT BUỘC:
 Trong mỗi lượt trả lời, bạn PHẢI tuân thủ đúng một trong hai cấu trúc sau:
