@@ -49,7 +49,7 @@ def run_pipeline(query, mode):
     for i in range(MAX_ITERATIONS):
         out = provider.generate(history, system_prompt=REACT_SYSTEM_PROMPT)
         if IS_LIVE:
-            time.sleep(13)
+            time.sleep(5)
         if not out:
             break
 
@@ -353,12 +353,12 @@ async function send(){
       vsWrapper.className = 'msg bot vs-container';
       
       const colBase = document.createElement('div'); colBase.className = 'vs-col';
-      colBase.innerHTML = '<div class="vs-col-title">Chatbot Baseline</div><div class="bubble" id="vs-base-bub"><div class="typing"><span></span><span></span><span></span></div></div>';
+      colBase.innerHTML = '<div class="vs-col-title">Chatbot Baseline</div><div class="bubble"><div class="typing"><span></span><span></span><span></span></div></div>';
       
       const divider = document.createElement('div'); divider.className = 'divider';
 
       const colReact = document.createElement('div'); colReact.className = 'vs-col';
-      colReact.innerHTML = '<div class="vs-col-title">ReAct Agent</div><div class="bubble" id="vs-react-bub"><div class="typing"><span></span><span></span><span></span></div></div>';
+      colReact.innerHTML = '<div class="vs-col-title">ReAct Agent</div><div class="bubble"><div class="typing"><span></span><span></span><span></span></div></div>';
       
       const vsGrid = document.createElement('div'); vsGrid.className = 'vs-grid';
       vsGrid.appendChild(colBase); vsGrid.appendChild(divider); vsGrid.appendChild(colReact);
@@ -367,18 +367,21 @@ async function send(){
       chat.appendChild(vsWrapper);
       chat.scrollTop = chat.scrollHeight;
 
+      const baseBub = colBase.querySelector('.bubble');
+      const reactBub = colReact.querySelector('.bubble');
+
       const pBase = fetchChat(q, 'baseline').then(html => {
-          document.getElementById('vs-base-bub').innerHTML = html;
+          baseBub.innerHTML = html;
           chat.scrollTop = chat.scrollHeight;
       }).catch(e => {
-          document.getElementById('vs-base-bub').innerHTML = '<span style="color:#111827;font-weight:600">Lỗi</span>';
+          baseBub.innerHTML = '<span style="color:#111827;font-weight:600">Lỗi</span>';
       });
 
       const pReact = fetchChat(q, 'react').then(html => {
-          document.getElementById('vs-react-bub').innerHTML = html;
+          reactBub.innerHTML = html;
           chat.scrollTop = chat.scrollHeight;
       }).catch(e => {
-          document.getElementById('vs-react-bub').innerHTML = '<span style="color:#111827;font-weight:600">Lỗi</span>';
+          reactBub.innerHTML = '<span style="color:#111827;font-weight:600">Lỗi</span>';
       });
 
       await Promise.all([pBase, pReact]);
